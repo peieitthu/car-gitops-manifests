@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: database
+  serviceName: "database"
+  replicas: 1 # by default is 1
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: database
+        image: mysql:8.4.7
+        ports:
+        - containerPort: 3306
+          name: database
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: frontiir
+        - name: MYSQL_USER
+          value: frontiir
+        - name: MYSQL_PASSWORD
+          value: frontiir
+        - name: MYSQL_DATABASE
+          value: api
+      volumes:
+        - name: mysql-data
+          hostPath:
+            # Directory path on the host node
+            path: /var/lib/mysql
+            # This "DirectoryOrCreate" type creates the host path if it does not exist
+            type: DirectoryOrCreate
